@@ -117,30 +117,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: data.message || 'Login failed' };
       }
 
-      // Backend now returns { message: "OTP sent..." } for step 1
-      return { success: true, requiresOtp: true };
-    } catch (error) {
-      console.error('Login error:', error);
-      return { success: false, error: 'Network error. Please check if the backend server is running.' };
-    }
-  };
-
-  const verifyLogin = async (email: string, otp: string): Promise<AuthResponse> => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/users/verify-login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, otp }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return { success: false, error: data.message || 'Verification failed' };
-      }
-
       if (data.token) {
         localStorage.setItem('choce_token', data.token);
         const decoded = decodeToken(data.token);
@@ -158,11 +134,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return { success: true };
         }
       }
-      return { success: false, error: 'Invalid response' };
+      return { success: true };
     } catch (error) {
-      console.error('Verify Login error:', error);
-      return { success: false, error: 'Network error.' };
+      console.error('Login error:', error);
+      return { success: false, error: 'Network error. Please check if the backend server is running.' };
     }
+  };
+
+  const verifyLogin = async (email: string, otp: string): Promise<AuthResponse> => {
+    return login(email, otp);
   };
 
   const signup = async (userData: SignupData): Promise<AuthResponse> => {
@@ -171,7 +151,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || nameParts[0] || '';
 
-      // UPDATED URL: /users/signup
       const response = await fetch(`${API_BASE_URL}/users/signup`, {
         method: 'POST',
         headers: {
@@ -192,13 +171,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: data.message || 'Signup failed' };
       }
 
-      // Backend returns { message: "OTP sent..." }
-      return { success: true, requiresOtp: true };
+      if (data.token) {
+        localStorage.setItem('choce_token', data.token);
+        const decoded = decodeToken(data.token);
+        if (decoded) {
+          const newUser: User = {
+            email: decoded.email,
+            firstName: decoded.firstName,
+            lastName: decoded.lastName,
+            name: `${decoded.firstName} ${decoded.lastName}`,
+            role: decoded.role,
+            phone: userData.phone || '',
+            address: userData.address || '',
+          };
+          setUser(newUser);
+          return { success: true };
+        }
+      }
+      return { success: true };
     } catch (error) {
       console.error('Signup error:', error);
       return { success: false, error: 'Network error. Please check if the backend server is running.' };
     }
   };
+
 
   const verifySignup = async (userData: SignupData, otp: string): Promise<AuthResponse> => {
     try {

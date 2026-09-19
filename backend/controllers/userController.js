@@ -1,21 +1,29 @@
 import User from '../models/user.js';
-import Otp from '../models/otp.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { sendOTPEmail } from '../utils/emailService.js';
-import crypto from 'crypto';
 
 dotenv.config();
 
-// Helper to generate 6-digit OTP
-const generateOTP = () => {
-    return crypto.randomInt(100000, 999999).toString();
+// Helper to generate JWT Token
+const generateToken = (user) => {
+    const secret = process.env.JWT_SECRET || 'choce_secret_key_fallback';
+    return jwt.sign(
+        {
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role,
+            isBlocked: user.isBlocked,
+            isEmailVerified: user.isEmailVerified,
+            image: user.image
+        },
+        secret,
+        { expiresIn: "7d" }
+    );
 };
 
-// --- SIGNUP FLOW ---
-
-// Step 1: Request OTP for Signup
+// --- DIRECT SIGNUP (NO OTP) ---
 export async function initiateSignup(req, res) {
     try {
         const { firstName, lastName, email, password } = req.body;
@@ -29,34 +37,6 @@ export async function initiateSignup(req, res) {
             return res.status(400).json({ message: "User already exists with this email" });
         }
 
-        const otp = generateOTP();
-        const otpEntry = new Otp({ email, otp });
-        await otpEntry.save();
-
-        const emailSent = await sendOTPEmail(email, otp);
-        if (!emailSent) {
-            return res.status(500).json({ message: "Failed to send OTP email" });
-        }
-
-        res.json({ message: "OTP sent to email. Please verify to complete signup." });
-
-    } catch (error) {
-        console.error("Signup Init Error:", error);
-        res.status(500).json({ message: "Server error" });
-    }
-}
-
-// Step 2: Verify OTP and Create User
-export async function verifySignup(req, res) {
-    try {
-        const { firstName, lastName, email, password, otp } = req.body;
-
-        const record = await Otp.findOne({ email, otp });
-        if (!record) {
-            return res.status(400).json({ message: "Invalid or expired OTP" });
-        }
-
-        // OTP Valid - Create User
         const passwordHash = await bcrypt.hash(password, 10);
         const user = new User({
             firstName,
@@ -66,23 +46,39 @@ export async function verifySignup(req, res) {
         });
 
         await user.save();
-        await Otp.deleteMany({ email }); // Clean up used OTPs
 
-        res.json({ message: "User created successfully. You can now login." });
+        const token = generateToken(user);
+
+        res.json({
+            token,
+            message: "User registered successfully",
+            user: {
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                role: user.role
+            }
+        });
 
     } catch (error) {
-        console.error("Signup Verify Error:", error);
-        res.status(500).json({ message: "Server error" });
+        console.error("Signup Error:", error);
+        res.status(500).json({ message: "Server error: " + error.message });
     }
 }
 
+// Retain verifySignup for backward compatibility
+export async function verifySignup(req, res) {
+    return initiateSignup(req, res);
+}
 
-// --- LOGIN FLOW ---
-
-// Step 1: Validate Creds & Send OTP
+// --- DIRECT LOGIN (NO OTP) ---
 export async function initiateLogin(req, res) {
     try {
         const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and password are required" });
+        }
 
         const user = await User.findOne({ email });
         if (!user) {
@@ -98,101 +94,42 @@ export async function initiateLogin(req, res) {
             return res.status(403).json({ message: "Account is blocked" });
         }
 
-        // Credentials valid - Send OTP
-        const otp = generateOTP();
+        const token = generateToken(user);
 
-        // Clean up any existing OTPs for this email
-        await Otp.deleteMany({ email });
-
-        const otpEntry = new Otp({ email, otp });
-        await otpEntry.save();
-
-        const emailSent = await sendOTPEmail(email, otp);
-        if (!emailSent) {
-            return res.status(500).json({ message: "Failed to send OTP email" });
-        }
-
-        res.json({ message: "OTP sent to email. Please verify to complete login." });
-
-    } catch (error) {
-        console.error("Login Init Error:", error);
-        res.status(500).json({ message: "Server error" });
-    }
-}
-
-// Step 2: Verify OTP and Issue Token
-export async function verifyLogin(req, res) {
-    try {
-        const { email, otp } = req.body;
-
-        const record = await Otp.findOne({ email, otp });
-        if (!record) {
-            return res.status(400).json({ message: "Invalid or expired OTP" });
-        }
-
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: "User not found" });
-        }
-
-        // Issue Token
-        const token = jwt.sign(
-            {
-                email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                role: user.role,
-                isBlocked: user.isBlocked,
-                isEmailVerified: user.isEmailVerified,
-                image: user.image
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: "1d" }
-        );
-
-        // Trigger n8n webhook (fire and forget) - Preserved logic
-        const webhookPayload = {
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName
-        };
-
+        // Optional webhook call
         try {
             fetch('https://bpasindu.app.n8n.cloud/webhook-test/user-login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(webhookPayload)
-            }).then(response => {
-                console.log('Webhook sent. Status:', response.status);
-            }).catch(err => {
-                console.error('Failed to trigger n8n login webhook:', err);
-            });
-        } catch (e) {
-            console.error("Webhook dispatch error", e);
-        }
-
-        await Otp.deleteMany({ email }); // Clean up used OTPs
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user.email, firstName: user.firstName, lastName: user.lastName })
+            }).catch(() => {});
+        } catch (e) {}
 
         res.json({
-            token: token,
-            message: "Login successful"
+            token,
+            message: "Login successful",
+            user: {
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                role: user.role
+            }
         });
 
     } catch (error) {
-        console.error("Login Verify Error:", error);
-        res.status(500).json({ message: "Server error" });
+        console.error("Login Error:", error);
+        res.status(500).json({ message: "Server error: " + error.message });
     }
+}
+
+// Retain verifyLogin for backward compatibility
+export async function verifyLogin(req, res) {
+    return initiateLogin(req, res);
 }
 
 export function isAdmin(req) {
     if (req.user == null) {
         return false;
     }
-    if (req.user.role == 'admin') {
-        return true;
-    } else {
-        return false;
-    }
+    return req.user.role === 'admin';
 }
