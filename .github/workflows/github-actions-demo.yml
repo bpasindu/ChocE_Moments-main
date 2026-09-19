@@ -1,0 +1,38 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          script: |
+            # Navigate to project directory
+            cd /home/ubuntu/choco1/ChocE_Moments
+            
+            # Pull latest changes
+            git pull origin main
+            
+            # Backend Deployment
+            cd backend
+            npm install
+            pm2 restart choce-backend
+            
+            # Frontend Deployment
+            cd ..
+            npm install
+            # Build using the relative API path for Nginx proxy
+            VITE_API_BASE_URL=/api npm run build

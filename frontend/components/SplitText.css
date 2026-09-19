@@ -1,0 +1,22 @@
+.split-text {
+  display: inline-block;
+}
+
+.split-text__char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: char-appear 0.5s ease-out forwards;
+}
+
+@keyframes char-appear {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.split-text__word {
+  display: inline-block;
+  white-space: pre;
+}

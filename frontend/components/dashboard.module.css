@@ -1,0 +1,302 @@
+/* ChocE Moments - Dashboard Styles */
+/* Color Palette: Bronze #C7A07A, Burgundy #A44529, Brown #734128, Cream #FDFCE8, Dark Green #16302B */
+
+.heroSection {
+  min-height: 400px;
+  background-color: rgba(22, 48, 43, 0.4);
+  border-width: 2px;
+  border-style: solid;
+  border-color: rgba(199, 160, 122, 0.3);
+}
+
+.heroGradient {
+  background: linear-gradient(135deg, rgba(57, 30, 16, 0.7) 0%, rgba(22, 48, 43, 0.7) 100%);
+  z-index: 1;
+}
+
+.heroContent {
+  z-index: 2;
+  min-height: 400px;
+}
+
+.heroBadge {
+  background-color: rgba(199, 160, 122, 0.2);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(199, 160, 122, 0.4);
+}
+
+.badgeText {
+  color: #C7A07A;
+}
+
+.heroTitle {
+  color: #FDFCE8;
+  font-family: Georgia, serif;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.heroDescription {
+  color: #E2CEB1;
+}
+
+.primaryButton {
+  background-color: #C7A07A;
+  color: #16302B;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #C7A07A;
+}
+
+.secondaryButton {
+  background-color: rgba(199, 160, 122, 0.2);
+  color: #FDFCE8;
+  border-width: 2px;
+  border-style: solid;
+  border-color: rgba(199, 160, 122, 0.6);
+}
+
+.statValue {
+  color: #C7A07A;
+}
+
+.statLabel {
+  color: #E2CEB1;
+}
+
+.statDivider {
+  background-color: rgba(199, 160, 122, 0.3);
+}
+
+.productCard {
+  background-color: rgba(57, 30, 16, 0.5);
+  border-width: 2px;
+  border-style: solid;
+  border-color: rgba(199, 160, 122, 0.3);
+}
+
+.productCardExpanded {
+  border-color: #C7A07A;
+}
+
+.productImage {
+  background-color: rgba(22, 48, 43, 0.5);
+}
+
+.customNameOverlay {
+  background-color: rgba(57, 30, 16, 0.8);
+}
+
+.customNameText {
+  color: #C7A07A;
+  font-family: Georgia, serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.favoriteButton {
+  background-color: rgba(57, 30, 16, 0.8);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(199, 160, 122, 0.4);
+}
+
+.favoriteButtonActive {
+  background-color: rgba(164, 69, 41, 0.9);
+}
+
+.favoriteIcon {
+  color: #C7A07A;
+}
+
+.favoriteIconActive {
+  color: #FDFCE8;
+}
+
+.productTitle {
+  color: #FDFCE8;
+  font-family: Georgia, serif;
+}
+
+.productRating {
+  color: #C7A07A;
+}
+
+.productDescription {
+  color: #E2CEB1;
+}
+
+.priceLabel {
+  color: #E2CEB1;
+}
+
+.priceCurrency {
+  color: #C7A07A;
+}
+
+.priceAmount {
+  color: #FDFCE8;
+}
+
+.selectButton {
+  background-color: #C7A07A;
+  color: #16302B;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(199, 160, 122, 0.5);
+}
+
+.selectButtonDisabled {
+  background-color: rgba(115, 65, 40, 0.5);
+  color: #E2CEB1;
+  cursor: not-allowed;
+}
+
+.sectionTitle {
+  color: #FDFCE8;
+}
+
+.quantityOption {
+  background-color: rgba(22, 48, 43, 0.5);
+  border-width: 2px;
+  border-style: solid;
+  border-color: rgba(199, 160, 122, 0.2);
+}
+
+.quantityOptionSelected {
+  background-color: rgba(199, 160, 122, 0.3);
+  border-color: #C7A07A;
+}
+
+.quantityLabel {
+  color: #FDFCE8;
+}
+
+.quantityPrice {
+  color: #C7A07A;
+}
+
+.addOnItem {
+  background-color: rgba(22, 48, 43, 0.3);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(199, 160, 122, 0.2);
+}
+
+.addOnItemSelected {
+  background-color: rgba(199, 160, 122, 0.2);
+  border-color: #C7A07A;
+}
+
+.addOnCheckbox {
+  accent-color: #C7A07A;
+}
+
+.addOnLabel {
+  color: #FDFCE8;
+}
+
+.addOnPrice {
+  color: #C7A07A;
+}
+
+.addOnInput {
+  background-color: rgba(22, 48, 43, 0.5);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(199, 160, 122, 0.3);
+  color: #FDFCE8;
+}
+
+.priceBreakdown {
+  background-color: rgba(199, 160, 122, 0.1);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(199, 160, 122, 0.3);
+}
+
+.priceBreakdownItem {
+  color: #E2CEB1;
+}
+
+.priceBreakdownTotal {
+  color: #C7A07A;
+  border-color: rgba(199, 160, 122, 0.3);
+}
+
+.cancelButton {
+  background-color: rgba(199, 160, 122, 0.2);
+  color: #FDFCE8;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(199, 160, 122, 0.4);
+}
+
+.addToCartButton {
+  background-color: #C7A07A;
+  color: #16302B;
+}
+
+.comingSoonBadge {
+  background-color: rgba(199, 160, 122, 0.9);
+}
+
+.comingSoonText {
+  color: #16302B;
+}
+
+.featuredSection {
+  color: #FDFCE8;
+  font-family: Georgia, serif;
+}
+
+.featuredSubtitle {
+  color: #E2CEB1;
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: rgba(57, 30, 16, 0.95);
+  border: 2px solid #C7A07A;
+  color: #FDFCE8;
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.toastSuccess {
+  border-color: #4CAF50;
+}
+
+.toastError {
+  border-color: #f44336;
+}
+
+.toastInfo {
+  border-color: #C7A07A;
+}
+
+/* Smooth expand/collapse animation */
+.expandable {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expandableContent {
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
