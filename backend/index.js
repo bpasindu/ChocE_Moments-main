@@ -86,11 +86,11 @@ app.use('/api/orders', orderRouter);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT,
-    () => {
+// Only start the server when running locally (not on Vercel serverless)
+if (process.env.VERCEL !== '1') {
+    app.listen(PORT, () => {
         console.log(`Server started on port ${PORT}`);
-    }  
-)    
+    });
+}
 
-
-
+export default app;
