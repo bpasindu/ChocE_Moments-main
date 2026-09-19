@@ -49,18 +49,27 @@ app.use(
     }
 
 )
-const connectionString = process.env.DATABASE_URL
+const connectionString = process.env.DATABASE_URL;
 
-mongoose.connect(connectionString).then(
-    () => {
-        console.log("✅ Connected to database")
+const connectDB = async () => {
+    if (mongoose.connection.readyState >= 1) return;
+    if (!connectionString) {
+        console.error("❌ DATABASE_URL is missing in environment variables");
+        return;
     }
-).catch(
-    (error) => {
-        console.error("❌ Failed to connect to the database:", error.message)
-        console.error("Please check your DATABASE_URL in .env file")
+    try {
+        await mongoose.connect(connectionString);
+        console.log("✅ Connected to database");
+    } catch (error) {
+        console.error("❌ Failed to connect to the database:", error.message);
     }
-)
+};
+
+app.use(async (req, res, next) => {
+    await connectDB();
+    next();
+});
+
 
 
 // Health check endpoint
